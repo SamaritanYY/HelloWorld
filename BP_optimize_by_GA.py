@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-mnist = input_data.read_data_sets('D:\\pyProject\\project01\\main\\', one_hot=True)
+mnist = input_data.read_data_sets('./', one_hot=True)
 
 
 # find non-zero fitness for selection
@@ -17,7 +17,7 @@ def select(pop, fitness):    # nature selection wrt pop's fitness
     return pop[idx]
 
 
-def crossover(parent, pop, accurate):     # mating process (genes crossover)
+def crossover(parent, pop):     # mating process (genes crossover)
     if np.random.rand() < CROSS_RATE:
         i_ = np.random.randint(0, POP_SIZE, size=1)                             # select another individual from pop
         cross_points = np.random.randint(0, 2, size=DNA_SIZE).astype(np.bool)   # choose crossover points
@@ -25,7 +25,7 @@ def crossover(parent, pop, accurate):     # mating process (genes crossover)
     return parent
 
 
-def mutate(child, accurate):
+def mutate(child):
     for point in range(DNA_SIZE):
         if np.random.rand() < MUTATION_RATE:
             child[point] = np.random.normal(scale=0.1)
@@ -37,7 +37,7 @@ input_size = 784
 hidden_units_size = 30
 batch_size = 100
 pop = np.array([[]])
-training_iterations = 10000
+
 W1_len = input_size * hidden_units_size
 W2_len = hidden_units_size * num_classes
 
@@ -116,8 +116,8 @@ while True:
     pop_copy = pop.copy()
     for parent in pop:
         i = 0
-        child = crossover(parent, pop_copy, fit_group[i])
-        child = mutate(child, fit_group[i])
+        child = crossover(parent, pop_copy)
+        child = mutate(child)
         parent[:] = child       # parent is replaced by its child
         i += 1
 
