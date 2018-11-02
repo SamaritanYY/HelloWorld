@@ -17,7 +17,7 @@ def select(pop, fitness):    # nature selection wrt pop's fitness
     return pop[idx]
 
 
-def crossover(parent, pop):     # mating process (genes crossover)
+def crossover(parent, pop, accurate):     # mating process (genes crossover)
     if np.random.rand() < CROSS_RATE:
         i_ = np.random.randint(0, POP_SIZE, size=1)                             # select another individual from pop
         cross_points = np.random.randint(0, 2, size=DNA_SIZE).astype(np.bool)   # choose crossover points
@@ -25,7 +25,7 @@ def crossover(parent, pop):     # mating process (genes crossover)
     return parent
 
 
-def mutate(child):
+def mutate(child, accurate):
     for point in range(DNA_SIZE):
         if np.random.rand() < MUTATION_RATE:
             child[point] = np.random.normal(scale=0.1)
@@ -46,7 +46,6 @@ DNA_SIZE = W1_len + W2_len + num_classes + hidden_units_size          # DNA leng
 POP_SIZE = 50           # population size
 CROSS_RATE = 0.8         # mating probability (DNA crossover)
 MUTATION_RATE = 0.003    # mutation probability
-N_GENERATIONS = 200
 
 for i in range(POP_SIZE):
     DNA = np.random.normal(size=[DNA_SIZE], scale=0.1)
@@ -78,10 +77,10 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, 'float'))
 sess.run(init)
 
 count = 0  # count training time
+pre_maxfit = 0
 
 while True:
     fit_group = np.array([])
-    # batch = mnist.train.next_batch(batch_size)
     for i in range(POP_SIZE):
         train_accuracy = [0, 0]
 
@@ -109,7 +108,10 @@ while True:
     fitness = get_fitness(fit_group)
     max_fit = fit_group[np.argmax(fit_group)]
     print("Highest accurate rate: ", max_fit)
-    plt.scatter(count*100, max_fit, s=200, lw=0, c='red', alpha=0.5)
+    plt.scatter(count*100, max_fit, s=20, lw=0, c='red')
+    if count > 0:
+        plt.plot([(count-1)*100, count*100], [pre_maxfit, max_fit], c='b')
+    pre_maxfit = max_fit
     count += 1
     if max_fit > 0.98:
         break
@@ -117,11 +119,12 @@ while True:
     pop_copy = pop.copy()
     for parent in pop:
         i = 0
-        child = crossover(parent, pop_copy)
-        child = mutate(child)
+        child = crossover(parent, pop_copy, fit_group[i])
+        child = mutate(child, fit_group[i])
         parent[:] = child       # parent is replaced by its child
         i += 1
-
+plt.xlabel("Iteration")
+plt.ylabel("Accuracy")
 plt.show()
 print("BP begin:")
 
