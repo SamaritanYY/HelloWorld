@@ -37,6 +37,7 @@ input_size = 784
 hidden_units_size = 30
 batch_size = 100
 pop = np.array([[]])
+training_iterations = 10000
 
 W1_len = input_size * hidden_units_size
 W2_len = hidden_units_size * num_classes
