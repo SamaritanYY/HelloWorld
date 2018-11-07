@@ -1,3 +1,6 @@
+
+'''using keras and mnist to train BP network'''
+
 from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense
